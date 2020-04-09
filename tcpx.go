@@ -6,23 +6,22 @@ import (
 )
 
 type TcpServer interface {
-	AddRouter(msgid int, handle func([]byte))
+	AddRouter(msgid int, handle func(c *Context))
 	Start(addr string) error
 }
 
-type function func(buf []byte)
-
+type tcpxFunction func(ctx *Context)
 
 type Handler struct {
-	addr string
-	clientList chan *Client
-	router map[int]function
+	addr       string
+	clientConn chan *Context
+	router     map[int]tcpxFunction
 }
 
 func NewServer() TcpServer {
 	srv := new(Handler)
-	srv.clientList = make(chan *Client)
-	srv.router = make(map[int]function)
+	srv.clientConn = make(chan *Context)
+	srv.router = make(map[int]tcpxFunction)
 	return srv
 }
 
@@ -30,13 +29,16 @@ func NewServer() TcpServer {
 func (srv *Handler) handler() {
 	for {
 		select {
-		case client := <-srv.clientList:
-			go client.GetPacket(srv.router)
+		case clientConn := <-srv.clientConn:
+			go clientConn.GetPacket(srv.router)
 		}
 	}
 }
 
-func (srv *Handler) AddRouter(msgid int, handle func(buf []byte)) {
+func (srv *Handler) AddRouter(msgid int, handle func(ctx *Context)) {
+	if _, ok := srv.router[msgid]; ok {
+		panic("当前消息id已经存在")
+	}
 	srv.router[msgid] = handle
 }
 
@@ -62,13 +64,12 @@ func (srv *Handler) accept(listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Printf("err:%+v\n",err)
+			log.Printf("err:%+v\n", err)
 			continue
 		}
 
-		log.Println(conn)
 		//获取当前的协议号，转发给不同的方法实现.
-		client := srv.NewClient(conn)
-		srv.clientList <- client
+		clientConn := srv.NewConn(conn)
+		srv.clientConn <- clientConn
 	}
 }

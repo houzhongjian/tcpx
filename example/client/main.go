@@ -8,29 +8,26 @@ import (
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	conn, err := net.Dial("tcp4","127.0.0.1:9999")
+	conn, err := net.Dial("tcp4", "127.0.0.1:9999")
 	if err != nil {
 		panic(err)
 	}
 
-
-	buf := Packet(1000, `{"account":"zhangsan", "password":"123456"}`)
+	buf := Packet(1001, `{"account":"zhangsan", "password":"123456"}`)
 	_, err = conn.Write(buf)
 	if err != nil {
 		log.Printf("err:%+v\n", err)
 		return
 	}
 
-	buf = Packet(1001,`{"account":"zhangsan", "password":"123456"}`)
+	buf = Packet(1002,"")
 	_, err = conn.Write(buf)
 	if err != nil {
 		log.Printf("err:%+v\n", err)
 		return
 	}
 
-	select {
-
-	}
+	select {}
 }
 
 func Packet(id int, msg string) []byte {

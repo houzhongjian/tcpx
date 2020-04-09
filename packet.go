@@ -7,19 +7,15 @@ import (
 )
 
 //GetMessageID 获取消息id.
-func (client *Client)GetMessageID() int {
+func (c *Context) GetMessageID() int {
 	var buf = make([]byte, 4)
-	_, err := io.ReadFull(client.conn, buf)
+	_, err := io.ReadFull(c.conn, buf)
 	if err != nil {
 		log.Printf("err:%+v\n", err)
-		client.Close()
+		c.Close()
 	}
 
 	binary.BigEndian.Uint32(buf)
 
 	return 0
-}
-
-func (client *Client) Close() {
-	defer client.conn.Close()
 }
