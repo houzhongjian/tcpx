@@ -20,7 +20,7 @@ func main() {
 		return
 	}
 
-	buf = Packet(1002,"")
+	buf = Packet(1002, "")
 	_, err = conn.Write(buf)
 	if err != nil {
 		log.Printf("err:%+v\n", err)

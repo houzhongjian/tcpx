@@ -16,6 +16,8 @@ type Handler struct {
 	addr       string
 	clientConn chan *Context
 	router     map[int]tcpxFunction
+	maxConn    int
+	session    int
 }
 
 func NewServer() TcpServer {
@@ -23,6 +25,11 @@ func NewServer() TcpServer {
 	srv.clientConn = make(chan *Context)
 	srv.router = make(map[int]tcpxFunction)
 	return srv
+}
+
+//SetMaxConn 设置最大的tcp连接数.
+func (srv *Handler) SetMaxConn(num int) {
+	srv.maxConn = num
 }
 
 //handler 处理具体的连接.
@@ -67,9 +74,15 @@ func (srv *Handler) accept(listener net.Listener) {
 			log.Printf("err:%+v\n", err)
 			continue
 		}
+		if srv.session == srv.maxConn {
+			log.Println("超过系统最大连接数")
+			conn.Close()
+			continue
+		}
 
 		//获取当前的协议号，转发给不同的方法实现.
 		clientConn := srv.NewConn(conn)
 		srv.clientConn <- clientConn
+		srv.session += 1
 	}
 }

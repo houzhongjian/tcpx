@@ -13,8 +13,8 @@ var playerManager *PlayerManager
 
 func init() {
 	playerManager = &PlayerManager{
-		RWMutex:sync.RWMutex{},
-		data:make(map[int]map[string]interface{}),
+		RWMutex: sync.RWMutex{},
+		data:    make(map[int]map[string]interface{}),
 	}
 }
 
@@ -34,7 +34,7 @@ func (p *PlayerManager) Get(playerid int, keys ...string) interface{} {
 
 	pdata := p.data[playerid]
 	if len(keys) > 0 {
-		val,ok := pdata[keys[0]]
+		val, ok := pdata[keys[0]]
 		if !ok {
 			return nil
 		}

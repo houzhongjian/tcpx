@@ -23,18 +23,18 @@ func Login(c *tcpx.Context) {
 	log.Println("登录", string(c.Body))
 
 	type Account struct {
-		Account string	`json:"account"`
-		Password string	`json:"password"`
+		Account  string `json:"account"`
+		Password string `json:"password"`
 	}
 
 	msg := Account{}
 	if err := c.BindJSON(&msg); err != nil {
-		log.Printf("err:%+v\n",err)
+		log.Printf("err:%+v\n", err)
 		return
 	}
 	log.Printf("msg:%+v\n", msg)
-	tcpx.GetPlayerManager().Set(123, "account",msg.Account)
-	tcpx.GetPlayerManager().Set(123, "password",msg.Password)
+	tcpx.GetPlayerManager().Set(123, "account", msg.Account)
+	tcpx.GetPlayerManager().Set(123, "password", msg.Password)
 }
 
 func Index(c *tcpx.Context) {
@@ -42,10 +42,9 @@ func Index(c *tcpx.Context) {
 	log.Println(tcpx.GetPlayerManager().Get(123))
 }
 
-
 func LogOut(c *tcpx.Context) {
 	log.Println("退出登录", string(c.Body))
-	log.Println(tcpx.GetPlayerManager().Get(123,"face").(string))
+	log.Println(tcpx.GetPlayerManager().Get(123, "face").(string))
 }
 
 func Register(c *tcpx.Context) {
